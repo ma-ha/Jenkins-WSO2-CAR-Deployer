@@ -1,0 +1,36 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+  <!--
+    This jelly script is used for per-project configuration.
+
+    See global.jelly for a general discussion about jelly script.
+  -->
+
+  <!--
+    Creates a text field that shows the value of the "name" property.
+    When submitted, it will be passed to the corresponding constructor parameter.
+  -->
+  <f:entry title="WSO2 Carbon App (CAR) Source Name" field="carSource">
+    <f:textbox />
+  </f:entry>
+  
+  <f:entry title="WSO2 Carbon App (CAR) Target File Name" field="carTargetFileName">
+    <f:textbox />
+  </f:entry>
+  
+  <f:entry title="App Type" field="appType">
+    <f:textbox />
+  </f:entry>
+  
+  <f:entry title="WSO2 service URL" field="wso2URL">
+    <f:textbox />
+  </f:entry>
+  
+  <f:entry title="WSO2 Admin User" field="wso2AdminUser">
+    <f:textbox />
+  </f:entry>
+  
+  <f:entry title="WSO2 Admin Password" field="wso2AdminPwd">
+ 	<f:password />
+  </f:entry>
+  
+</j:jelly>

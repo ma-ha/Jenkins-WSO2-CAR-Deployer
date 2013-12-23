@@ -1,0 +1,6 @@
+<!--
+  This view is used to render the installed plugins page.
+-->
+<div>
+  Publishes Carbon App (CAR) to a WSO2 ESB or Server via SOAP admin API.
+</div>

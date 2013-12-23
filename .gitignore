@@ -4,3 +4,12 @@
 *.jar
 *.war
 *.ear
+/target
+
+# ignore all files ending with ~
+*~ 
+
+# Eclipse project files
+/.settings
+.classpath
+.project

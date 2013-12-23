@@ -1,0 +1,109 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	
+	<modelVersion>4.0.0</modelVersion>
+	
+	<artifactId>Jenkins-WSO2-CAR-Deployer</artifactId>
+	<version>0.5</version>
+	<name>WSO2-CAR-Deployer</name>
+
+	<packaging>hpi</packaging>
+
+	<parent>
+		<groupId>org.jenkins-ci.plugins</groupId>
+		<artifactId>plugin</artifactId>
+		<version>1.509.4</version> <!-- which version of Jenkins is this plugin built against? -->
+	</parent>
+
+	<licenses>
+		<license>
+			<name>MIT license</name>
+			<comments>All source code is under the MIT license.</comments>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>ma-ha</id>
+			<name>Markus Harms</name>
+			<email>m.e.harms(at)t-online.de</email>
+		</developer>
+	</developers>
+
+	<properties>
+		<java-version>1.7</java-version>
+		<org.springframework-version>3.0.6.RELEASE</org.springframework-version>
+		<cxf.version>2.7.8</cxf.version>
+	</properties>
+
+	<repositories>
+
+		<repository>
+			<id>repo.jenkins-ci.org</id>
+			<url>http://repo.jenkins-ci.org/public/</url>
+		</repository>
+
+		<repository>
+			<releases>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>ignore</checksumPolicy>
+			</releases>
+			<id>wso2-nexus</id>
+			<url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+		</repository>
+
+	</repositories>
+
+	<pluginRepositories>
+
+		<pluginRepository>
+			<id>repo.jenkins-ci.org</id>
+			<url>http://repo.jenkins-ci.org/public/</url>
+		</pluginRepository>
+
+		<pluginRepository>
+			<releases>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>ignore</checksumPolicy>
+			</releases>
+			<id>wso2-nexus</id>
+			<url>http://maven.wso2.org/nexus/content/groups/wso2-public/</url>
+		</pluginRepository>
+
+	</pluginRepositories>
+	
+	<dependencies>
+
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-frontend-jaxws</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-bindings-soap</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-web</artifactId>
+			<version>${org.springframework-version}</version>
+		</dependency>
+
+	    <dependency>
+			<groupId>org.jenkins-ci.main</groupId>
+			<artifactId>maven-plugin</artifactId>
+	    </dependency>
+
+	</dependencies>
+	
+	
+</project>
