@@ -29,7 +29,7 @@ public class Wso2CarDeployClient {
 	 * @param listener */
 	public Wso2CarDeployClient(  String serviceUrl, String adminUser, String adminPwd, BuildListener listener ) {
 		this.listener = listener;
-		listener.getLogger().println("[WSO2 Deployer] Set up SOAP admin client...");   	
+		listener.getLogger().println("[WSO2 CAR Deployer] Set up SOAP admin client...");   	
 		
 		Properties properties = System.getProperties();
 		properties.put( "org.apache.cxf.stax.allowInsecureParser", "1" );
@@ -38,8 +38,8 @@ public class Wso2CarDeployClient {
 	    JaxWsProxyFactoryBean clientFactory = new JaxWsProxyFactoryBean(); 
         clientFactory.setAddress( serviceUrl+"CarbonAppUploader.CarbonAppUploaderHttpsEndpoint/" );
 		clientFactory.setServiceClass( CarbonAppUploaderPortType.class );
-		clientFactory.setUsername("admin");
-		clientFactory.setPassword("admin");
+		clientFactory.setUsername( adminUser );
+		clientFactory.setPassword( adminPwd );
 		
 		uploadSvc =	(CarbonAppUploaderPortType) clientFactory.create();
 		
@@ -96,15 +96,15 @@ public class Wso2CarDeployClient {
 	        UploadApp req = new UploadApp();
 	        req.getFileItems().add( fileItem );
 			
-	        listener.getLogger().println( "[WSO2 Deployer] Invoking uploadService for "+targetFileName+" ...");
+	        listener.getLogger().println( "[WSO2 CAR Deployer] Invoking uploadService for "+targetFileName+" ...");
 			uploadSvc.uploadApp( req );
 			
 		} catch ( Exception e) {
 			if ( e.getMessage().indexOf("uploadAppResponse was not recognized") > 0 ) {
 				// TODO: Why is the response empty in WSDL?
-				listener.getLogger().println( "[WSO2 Deployer] WARNING: response ignored ;-)" );	
+				listener.getLogger().println( "[WSO2 CAR Deployer] WARNING: response ignored ;-)" );	
 			} else {
-				listener.getLogger().println( "[WSO2 Deployer] ERROR: "+e.getMessage() );
+				listener.getLogger().println( "[WSO2 CAR Deployer] ERROR: "+e.getMessage() );
 				result = false;
 				e.printStackTrace();
 			}
@@ -115,11 +115,11 @@ public class Wso2CarDeployClient {
 	
 	/** helper to read aar into byte array */
 	private byte[] readFile( InputStream fin ) throws IOException {
-		listener.getLogger().println( "[WSO2 Deployer] Prepare data ...");
+		listener.getLogger().println( "[WSO2 CAR Deployer] Prepare data ...");
 		
 		byte fileContent[] = new byte[ (int) fin.available() ];
 	    int cnt = fin.read( fileContent );
-	    listener.getLogger().println( "[WSO2 Deployer] Read "+cnt+" bytes" );
+	    listener.getLogger().println( "[WSO2 CAR Deployer] Read "+cnt+" bytes" );
         fin.close();
         
         return fileContent;

@@ -70,39 +70,39 @@ public class Wso2CarPublisher extends Recorder {
 	@Override
 	public boolean perform( AbstractBuild build, Launcher launcher, BuildListener listener ) throws InterruptedException, IOException {
 		if ( build.getResult().isWorseOrEqualTo( Result.FAILURE) ) {
-			listener.getLogger().println( "[WSO2 Deployer] WSO2 CAR upload: STOP, due to worse build result!" );
+			listener.getLogger().println( "[WSO2 CAR Deployer] WSO2 CAR upload: STOP, due to worse build result!" );
 			return true; // nothing to do
 		}
-		listener.getLogger().println( "[WSO2 Deployer] WSO2 CAR upload initiated (baseDir="+build.getArtifactsDir().getPath()+")" );
+		listener.getLogger().println( "[WSO2 CAR Deployer] WSO2 CAR upload initiated (baseDir="+build.getArtifactsDir().getPath()+")" );
 
 		if ( StringUtils.isBlank( carTargetFileName ) ) {
-			listener.error( "[WSO2 Deployer] CAR file name must be set!" ); 
+			listener.error( "[WSO2 CAR Deployer] CAR file name must be set!" ); 
 			return false;
 		}
 		if ( ! carTargetFileName.toLowerCase().endsWith( ".car" ) ) {
-			listener.error( "[WSO2 Deployer] CAR target file name must has .car ending!" ); 
+			listener.error( "[WSO2 CAR Deployer] CAR target file name must has .car ending!" ); 
 			return false;
 		}
 		if ( ! carSource.toLowerCase().endsWith( ".car" ) ) {
-			listener.error( "[WSO2 Deployer] CAR source file name must has .car ending!" ); 
+			listener.error( "[WSO2 CAR Deployer] CAR source file name must has .car ending!" ); 
 			return false;
 		}
 		if ( StringUtils.isBlank( carSource ) ) {
-			listener.error( "[WSO2 Deployer] CAR source name must be set!" ); 
+			listener.error( "[WSO2 CAR Deployer] CAR source name must be set!" ); 
 			return false;
 		}
 		if ( StringUtils.isBlank( wso2URL ) ) {
-			listener.error( "[WSO2 Deployer] WSO2 server URL must be set!" ); 
+			listener.error( "[WSO2 CAR Deployer] WSO2 server URL must be set!" ); 
 			return false;
 		}
 		// Validates that the organization token is filled in the project configuration.
 		if ( StringUtils.isBlank( wso2AdminUser ) ) {
-			listener.error( "[WSO2 Deployer] Admin user name must be set!" ); 
+			listener.error( "[WSO2 CAR Deployer] Admin user name must be set!" ); 
 			return false;
 		}
 		// Validates that the organization token is filled in the project configuration.
 		if ( StringUtils.isBlank( wso2AdminPwd ) ) {
-			listener.error( "[WSO2 Deployer] Admin password must be set!" ); 
+			listener.error( "[WSO2 CAR Deployer] Admin password must be set!" ); 
 			return false;
 		}
 
@@ -110,18 +110,18 @@ public class Wso2CarPublisher extends Recorder {
 
 		FilePath[] aarList = build.getWorkspace().list( carSource );
 		if ( aarList.length == 0 ) {
-			listener.error( "[WSO2 Deployer] No CAR file found for '"+carSource+"'" );   
+			listener.error( "[WSO2 CAR Deployer] No CAR file found for '"+carSource+"'" );   
 			return false;
 		} else if ( aarList.length != 1  ) {
-			listener.error( "[WSO2 Deployer] Multiple CAR files found for '"+carSource+"'" );   
+			listener.error( "[WSO2 CAR Deployer] Multiple CAR files found for '"+carSource+"'" );   
 			for ( FilePath aarFile : aarList ) {
 				listener.getLogger().println( "AAR is n="+aarFile.toURI() );
 			}
 			return false;
 		} else {
 			for ( FilePath aarFile : aarList ) {
-				listener.getLogger().println( "[WSO2 Deployer] CAR file is   = "+ aarFile.toURI() );
-				listener.getLogger().println( "[WSO2 Deployer] CAR file size = "+ aarFile.read().available()  );
+				listener.getLogger().println( "[WSO2 CAR Deployer] CAR file is   = "+ aarFile.toURI() );
+				listener.getLogger().println( "[WSO2 CAR Deployer] CAR file size = "+ aarFile.read().available()  );
 
 				InputStream fileIs = aarFile.read();
 
