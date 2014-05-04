@@ -32,4 +32,11 @@ Remark: You will get an exception on the Jenkins console:<br>
 <tt>org.apache.cxf.interceptor.Fault: Message part {http://upload.application.carbon.wso2.org}uploadAppResponse was not recognized.  (Does it exist in service WSDL?)</tt><br>
 This is ignored by the plugin, since it is a problem of the WSO2 WSDL generated code.
 
+Jenkins Parameterized Build:
+----------------------------
+You can use build parameters and put them into the plug in form as $ parameters. This is ideal to reduce the number of build of jobs.
+Lets say you have defined the parameter <tt>URL</tt> as build parameter, you can type <tt>$URL</tt> into the 'WSO2 Service URL' field, 
+to tell the plug in to use this parameter as service URL. 
 
+Currently you can either use static strings or a parameter, replacement of sub strings is not possible. 
+Please feel free to implement this, if you need it.
