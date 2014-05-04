@@ -2,6 +2,7 @@ package org.mh.jenkins.wso2;
 
 import hudson.model.BuildListener;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
@@ -24,6 +25,9 @@ public class Wso2CarDeployClient {
 
 	private CarbonAppUploaderPortType uploadSvc;
 	private BuildListener listener;
+	
+	/** File read buffer size. */
+    private static final int READ_BUFFER_SIZE = 4096;
 	
 	/** Constructor sets up the web service proxy client 
 	 * @param listener */
@@ -87,7 +91,10 @@ public class Wso2CarDeployClient {
 	        UploadedFileItem fileItem = new UploadedFileItem();
 	        
 	        org.wso2.carbon.application.upload.xsd.ObjectFactory fieldFactory = new org.wso2.carbon.application.upload.xsd.ObjectFactory();
-	        byte[] fileContent = readFile( fin );
+	        //byte[] fileContent = readFile( fin );
+	        final byte fileContent[] = readFully(fin);
+	        final int cnt = fileContent.length;
+	        listener.getLogger().println( "[WSO2 CAR Deployer] Read CAR with "+cnt+" bytes" );
 
 	        fileItem.setDataHandler( fieldFactory.createUploadedFileItemDataHandler( fileContent ) );
 	        fileItem.setFileName( fieldFactory.createUploadedFileItemFileName( targetFileName ) );
@@ -112,18 +119,26 @@ public class Wso2CarDeployClient {
 		
 		return result ;
 	}
-	
-	/** helper to read aar into byte array */
-	private byte[] readFile( InputStream fin ) throws IOException {
-		listener.getLogger().println( "[WSO2 CAR Deployer] Prepare data ...");
-		
-		byte fileContent[] = new byte[ (int) fin.available() ];
-	    int cnt = fin.read( fileContent );
-	    listener.getLogger().println( "[WSO2 CAR Deployer] Read "+cnt+" bytes" );
-        fin.close();
-        
-        return fileContent;
-	}
-	
+
+   /**
+     * Read all data available in this input stream and return it as byte[].
+     * Take care for memory on large files!
+     * <p>
+     * Imported from org.jcoderz.commons.util.IoUtil</p>
+     *
+     * @param is the input stream to read from (will not be closed).
+     * @return a byte array containing all data read from the is.
+     */
+    private byte[] readFully(InputStream is) throws IOException {
+        final byte[] buffer = new byte[READ_BUFFER_SIZE];
+        int read = 0;
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+        while ((read = is.read(buffer)) >= 0) {
+            out.write(buffer, 0, read);
+        }
+
+        return out.toByteArray();
+    }
 	
 }

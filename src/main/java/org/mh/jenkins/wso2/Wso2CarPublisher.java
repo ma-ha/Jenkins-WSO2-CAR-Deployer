@@ -121,7 +121,7 @@ public class Wso2CarPublisher extends Recorder {
 		} else {
 			for ( FilePath aarFile : aarList ) {
 				listener.getLogger().println( "[WSO2 CAR Deployer] CAR file is   = "+ aarFile.toURI() );
-				listener.getLogger().println( "[WSO2 CAR Deployer] CAR file size = "+ aarFile.read().available()  );
+				listener.getLogger().println( "[WSO2 CAR Deployer] CAR file size = "+ aarFile.length() );
 
 				InputStream fileIs = aarFile.read();
 
