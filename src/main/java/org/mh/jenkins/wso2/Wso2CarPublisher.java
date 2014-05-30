@@ -31,6 +31,10 @@ import org.kohsuke.stapler.StaplerRequest;
  */
 public class Wso2CarPublisher extends Recorder {
 
+	// job environment
+	EnvVars env;
+
+	// job params
 	public  String carSource;
 	public  String carTargetFileName;
 	public  String appType;
@@ -67,111 +71,80 @@ public class Wso2CarPublisher extends Recorder {
 	@SuppressWarnings("rawtypes")
 	@Override
 	public boolean perform( AbstractBuild build, Launcher launcher, BuildListener listener ) throws InterruptedException, IOException {
-		EnvVars env = build.getEnvironment( listener ); 	
-		String xcarSource = carSource;
-		String xcarTargetFileName = carTargetFileName;
-		String xwso2URL = wso2URL;
-		String xwso2AdminUser = wso2AdminUser;
-		String xwso2AdminPwd = wso2AdminPwd;
-
+		env = build.getEnvironment( listener ); 	
+		
+		// deployment only, if build is successfully 
 		if ( build.getResult().isWorseOrEqualTo( Result.FAILURE) ) {
 			listener.getLogger().println( "[WSO2 CAR Deployer] WSO2 CAR upload: STOP, due to worse build result!" );
 			return true; // nothing to do
 		}
 		listener.getLogger().println( "[WSO2 CAR Deployer] WSO2 CAR upload initiated (baseDir="+build.getArtifactsDir().getPath()+")" );
 
-		if ( StringUtils.isBlank( xcarTargetFileName ) ) {
-			listener.error( "[WSO2 CAR Deployer] CAR file name must be set!" ); 
-			return false;
-		} else 	if ( ! xcarTargetFileName.toLowerCase().endsWith( ".car" ) ) {
-			listener.error( "[WSO2 CAR Deployer] CAR target file name must has .car ending!" ); 
-			return false;
-		} else {
-			if ( xcarTargetFileName.startsWith( "$" ) ) {
-				String envVar = xcarTargetFileName.substring( 1 );
-				listener.getLogger().println( "[WSO2 Deployer] 'CAR File Name' from env var: "+envVar );
-				xcarTargetFileName = env.get( envVar );
+		try {
+			// validate input and get variable values
+			String xCarSource         = checkParam( carSource, "AAR source", listener );
+			String xCarTargetFileName = checkParam( carTargetFileName, "AAR target file name", listener );
+			String xWso2URL           = checkParam( wso2URL, "WSO2 Server URL", listener );
+			String xWso2AdminUser     = checkParam( wso2AdminUser, "WSO2 admin user", listener );
+			String xWso2AdminPwd      = checkParam( wso2AdminPwd, "WSO2 admin password", listener );
+			
+			if ( ! xWso2URL.endsWith("/") ) {
+				xWso2URL += "/";
 			}
-		}
-		
-		if ( StringUtils.isBlank( xcarSource ) ) {
-			listener.error( "[WSO2 CAR Deployer] CAR source name must be set!" ); 
-			return false;
-		} else 	if ( ! xcarSource.toLowerCase().endsWith( ".car" ) ) {
-			listener.error( "[WSO2 CAR Deployer] CAR source file name must has .car ending!" ); 
-			return false;
-		} else {
-			if ( xcarSource.startsWith( "$" ) ) {
-				String envVar = xcarSource.substring( 1 );
-				listener.getLogger().println( "[WSO2 Deployer] 'CAR Source File' from env var: "+envVar );
-				xcarSource = env.get( envVar );
+
+			boolean result = true;
+	
+			FilePath[] aarList = build.getWorkspace().list( xCarSource );
+			if ( aarList.length == 0 ) {
+				listener.error( "[WSO2 CAR Deployer] No CAR file found for '"+xCarSource+"'" );   
+				return false;
+			} else if ( aarList.length != 1  ) {
+				listener.error( "[WSO2 CAR Deployer] Multiple CAR files found for '"+xCarSource+"'" );   
+				for ( FilePath aarFile : aarList ) {
+					listener.getLogger().println( "AAR is n="+aarFile.toURI() );
+				}
+				return false;
+			} else {
+				for ( FilePath aarFile : aarList ) {
+					listener.getLogger().println( "[WSO2 CAR Deployer] CAR file is   = "+ aarFile.toURI() );
+					listener.getLogger().println( "[WSO2 CAR Deployer] CAR file size = "+ aarFile.length() );
+					listener.getLogger().println( "[WSO2 CAR Deployer] CAR target is = "+xCarTargetFileName );
+	
+					InputStream fileIs = aarFile.read();
+	
+					Wso2CarDeployClient deployer = new Wso2CarDeployClient( xWso2URL, xWso2AdminUser, xWso2AdminPwd, listener );
+					result = deployer.uploadCAR( fileIs, xCarTargetFileName, appType );
+				}
 			}
-		}
-		
-		if ( StringUtils.isBlank( xwso2URL ) ) {
-			listener.error( "[WSO2 CAR Deployer] WSO2 server URL must be set!" ); 
+			return result;
+			
+		} catch ( Exception e ) {
 			return false;
-		} else {
-			if ( xwso2URL.startsWith( "$" ) ) {
-				String envVar = xwso2URL.substring( 1 );
-				listener.getLogger().println( "[WSO2 Deployer] 'WSO2 Server URL' from env var: "+envVar );
-				xwso2URL = env.get( envVar );
-			}
-			if ( ! xwso2URL.endsWith("/") ) {
-				xwso2URL += "/";
-			}
-		}
-		
-		// Validates that the organization token is filled in the project configuration.
-		if ( StringUtils.isBlank( xwso2AdminUser ) ) {
-			listener.error( "[WSO2 CAR Deployer] Admin user name must be set!" ); 
-			return false;
-		} else {
-			if ( xwso2AdminUser.startsWith( "$" ) ) {
-				String envVar = xwso2AdminUser.substring( 1 );
-				listener.getLogger().println( "[WSO2 Deployer] 'Admin User' from env var: "+envVar );
-				xwso2AdminUser = env.get( envVar );
-			}
-		}
-		
-		// Validates that the organization token is filled in the project configuration.
-		if ( StringUtils.isBlank( xwso2AdminPwd ) ) {
-			listener.error( "[WSO2 CAR Deployer] Admin password must be set!" ); 
-			return false;
-		} else {
-			if ( xwso2AdminPwd.startsWith( "$" ) ) {
-				String envVar = xwso2AdminPwd.substring( 1 );
-				listener.getLogger().println( "[WSO2 Deployer] 'Admin Password' from env var: "+envVar );
-				xwso2AdminPwd = env.get( envVar );
-			}
 		}
 
-		boolean result = true;
+	}
 
-		FilePath[] aarList = build.getWorkspace().list( xcarSource );
-		if ( aarList.length == 0 ) {
-			listener.error( "[WSO2 CAR Deployer] No CAR file found for '"+xcarSource+"'" );   
-			return false;
-		} else if ( aarList.length != 1  ) {
-			listener.error( "[WSO2 CAR Deployer] Multiple CAR files found for '"+xcarSource+"'" );   
-			for ( FilePath aarFile : aarList ) {
-				listener.getLogger().println( "AAR is n="+aarFile.toURI() );
-			}
-			return false;
+	// --------------------------------------------------------------------------------------------
+	/** Validate input and get variable values (if set) */
+	private String checkParam( String param, String logName, BuildListener listener ) throws Exception {
+		String result = param;
+		if ( StringUtils.isBlank( param ) ) {
+			listener.error( "[WSO2 Deployer] "+logName+" must be set!" ); 
+			throw new Exception("param is blanc");
 		} else {
-			for ( FilePath aarFile : aarList ) {
-				listener.getLogger().println( "[WSO2 CAR Deployer] CAR file is   = "+ aarFile.toURI() );
-				listener.getLogger().println( "[WSO2 CAR Deployer] CAR file size = "+ aarFile.length() );
-
-				InputStream fileIs = aarFile.read();
-
-				Wso2CarDeployClient deployer = new Wso2CarDeployClient( xwso2URL, xwso2AdminUser, xwso2AdminPwd, listener );
-				result = deployer.uploadCAR( fileIs, xcarTargetFileName, appType );
+			if ( param.startsWith( "$" ) ) {
+				String envVar = param.substring( 1 );
+				listener.getLogger().println( "[WSO2 Deployer] '"+logName+"' from env var: $"+envVar );
+				result = env.get( envVar );
+				if ( result == null ) {
+					listener.error( "[WSO2 Deployer] $"+envVar+" is null (check parameter names and settings)" ); 
+					throw new Exception("var is null");					
+				}
 			}
 		}
 		return result;
 	}
-
+	
 	// --------------------------------------------------------------------------------------------
 
 	@Extension // This indicates to Jenkins that this is an implementation of an extension point.
